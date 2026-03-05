@@ -1,3 +1,4 @@
+# train_digit_model.py
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 import joblib

@@ -1,3 +1,4 @@
+# test_system.py
 import os
 from src.preprocess import load_image
 from src.lector_matriculas import leer_digitos
