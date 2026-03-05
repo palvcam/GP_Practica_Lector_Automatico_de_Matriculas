@@ -1,23 +1,26 @@
-# Imagen base
-FROM python:3.10
+FROM python:3.10-slim
 
-# Instalar librerías necesarias para OpenCV
-RUN apt-get update && apt-get install -y libgl1
-
-# Directorio de trabajo
-WORKDIR /app
-
-# Copiar requirements
-COPY requirements.txt .
-
-# Instalar dependencias Python
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copiar proyecto
-COPY . .
-
-# Añadir proyecto al PYTHONPATH
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# Ejecutar el sistema
-CMD ["python", "src/lector_matriculas.py"]
+WORKDIR /app
+
+# Dependencias del sistema para OpenCV (libxcb, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ src/
+COPY models/ models/
+COPY data/ data/
+COPY tests/ tests/
+
+CMD ["python", "-m", "src.lector_matriculas"]
