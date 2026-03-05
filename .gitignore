@@ -1,0 +1,16 @@
+# Entornos virtuales
+.venv/
+
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# Dataset descargado
+mnist/
+*.gz
+
+# Sistema
+.DS_Store
