@@ -59,20 +59,24 @@ def leer_digitos(imagen):
 # Ejecución de prueba del sistema
 if __name__ == "__main__":
 
-    # Carpeta de imágenes de prueba
-    valid_dir = os.path.join(BASE_DIR, "data", "invalid")
+    valid_dir = os.path.join(BASE_DIR, "data", "valid")
+    invalid_dir = os.path.join(BASE_DIR, "data", "invalid")
 
-    # Seleccionar una imagen cualquiera
-    file = os.listdir(valid_dir)[0]
+    def probar_primera_imagen(directorio, etiqueta):
+        files = sorted(os.listdir(directorio))
+        if not files:
+            print(f"[{etiqueta}] No hay imágenes en {directorio}")
+            return
 
-    image_path = os.path.join(valid_dir, file)
+        file = files[0]
+        image_path = os.path.join(directorio, file)
 
-    # Cargar imagen
-    img = load_image(image_path)
+        img = load_image(image_path)
+        plate, ok = leer_digitos(img)
 
-    # Ejecutar lector de matrícula
-    plate, valid = leer_digitos(img)
+        print(f"\n[{etiqueta}] Imagen: {file}")
+        print(f"[{etiqueta}] Matrícula: {plate}")
+        print(f"[{etiqueta}] Válida: {ok}")
 
-    print("Imagen:", file)
-    print("Matrícula:", plate)
-    print("Válida:", valid)
+    probar_primera_imagen(valid_dir, "VALID")
+    probar_primera_imagen(invalid_dir, "INVALID")
