@@ -32,8 +32,6 @@ data/
 - invalid/    # Ejemplos de matrículas inválidas
 
 tests/
-- test_unit.py
-- test_integration.py
 - test_system.py
 
 train_digit_model.py
