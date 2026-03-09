@@ -17,9 +17,7 @@ IMG_SIZE = 28
 INVALID_CLASS = 10
 
 
-# =========================================================
-# FUNCIONES PARA CREAR EJEMPLOS INVALID
-# =========================================================
+# Funciones para crear imágenes invalid
 
 def add_occlusion(img):
     """
@@ -73,7 +71,7 @@ def shift_digit(img):
     dx = np.random.randint(-6, 7)
     dy = np.random.randint(-6, 7)
 
-    # Transformación afín
+    # Transformación similar
     shifted = tf.keras.preprocessing.image.apply_affine_transform(
         img[..., np.newaxis],
         tx=dy,
@@ -123,7 +121,7 @@ def build_invalid_samples(X_digits, n_invalid):
             "random"
         ])
 
-        # Partimos de un dígito real si el modo lo necesita
+        # Partimos de un dígito real 
         if mode in ["occluded", "noisy", "shifted"]:
             img = X_digits[np.random.randint(0, n_source)].copy()
 
@@ -145,9 +143,7 @@ def build_invalid_samples(X_digits, n_invalid):
     return np.array(invalids, dtype=np.float32)
 
 
-# =========================================================
-# CONSTRUCCIÓN DE LA CNN
-# =========================================================
+# CNN
 
 def build_model():
     """
@@ -198,9 +194,7 @@ def build_model():
     return model
 
 
-# =========================================================
-# CARGA DE DATOS
-# =========================================================
+# Cargar datos
 
 print("Loading MNIST...")
 

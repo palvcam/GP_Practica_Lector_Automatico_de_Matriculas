@@ -6,7 +6,7 @@ import numpy as np
 
 def load_image(path):
     """
-    Carga una imagen en escala de grises desde disco.
+    Carga una imagen en escala de grises desde el path
     """
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 

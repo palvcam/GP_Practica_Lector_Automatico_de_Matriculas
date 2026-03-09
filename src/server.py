@@ -1,19 +1,36 @@
+# Importamos Flask para crear la API web
 from flask import Flask, request, jsonify
 import numpy as np
 import cv2
 
 from src.lector_matriculas import leer_digitos
-
+# Creamos la aplicación Flask
 app = Flask(__name__)
 
 
 def file_to_gray_image(file_storage):
+    """
+    Convierte el archivo recibido desde Flask en una imagen
+    en escala de grises lista para procesar con OpenCV.
+
+    Parámetros:
+        file_storage: archivo recibido en request.files
+
+    Devuelve:
+        img: imagen decodificada en escala de grises
+
+    Lanza:
+        ValueError si el archivo está vacío o no se puede decodificar.
+    """
+    # Leemos todos los bytes del archivo subido
     file_bytes = file_storage.read()
 
     if not file_bytes:
         raise ValueError("El archivo está vacío")
-
+    
+    # Convertimos los bytes en un array de NumPy de tipo uint8
     np_arr = np.frombuffer(file_bytes, np.uint8)
+    # Decodificamos la imagen en escala de grises
     img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
 
     if img is None:
@@ -24,6 +41,10 @@ def file_to_gray_image(file_storage):
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    """
+    Endpoint que recibe una imagen por POST, la procesa
+    y devuelve la matrícula detectada junto con su validez.
+    """
     if "image" not in request.files:
         return jsonify({"error": "Falta el archivo en el campo 'image'"}), 400
 
@@ -33,15 +54,18 @@ def predict():
         return jsonify({"error": "No se ha seleccionado ningún archivo"}), 400
 
     try:
+        # Convertimos el archivo recibido en una imagen en gris
         img = file_to_gray_image(file)
 
         # Redimensionar para adaptarlo al formato esperado
         img = cv2.resize(img, (112, 28))
 
+        # Llamamos a la función que intenta leer la matrícula
         plate, ok = leer_digitos(img)
-
+    # Si ocurre un error controlado relacionado con la imagen
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    # Si ocurre cualquier otro error
     except Exception as e:
         return jsonify({"error": f"Error procesando la imagen: {str(e)}"}), 500
 

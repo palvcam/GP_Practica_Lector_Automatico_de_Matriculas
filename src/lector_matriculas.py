@@ -14,9 +14,7 @@ def leer_digitos(imagen):
     - valido: True/False según si la matrícula es válida
     """
 
-    # =========================================================
-    # 1. COMPROBACIONES BÁSICAS DE LA IMAGEN
-    # =========================================================
+    # 1)Comprobaciones de imagen
 
     # El sistema espera una imagen de 28x112
     # (4 dígitos de 28x28 colocados horizontalmente)
@@ -35,9 +33,7 @@ def leer_digitos(imagen):
     if np.std(imagen) < 10:
         return "", False
 
-    # =========================================================
-    # 2. SEGMENTACIÓN EN 4 DÍGITOS
-    # =========================================================
+    # 2) Segmentación en 4
 
     digits = split_digits(imagen)
 
@@ -46,9 +42,7 @@ def leer_digitos(imagen):
 
     plate = ""
 
-    # =========================================================
-    # 3. CLASIFICACIÓN DÍGITO A DÍGITO
-    # =========================================================
+    # 3) Clasificación dígito a dígito
 
     for d in digits:
         pred, conf, entropy, is_invalid = predict_digit(d)
@@ -68,9 +62,7 @@ def leer_digitos(imagen):
         # Si pasa todos los filtros, añadimos el dígito
         plate += str(pred)
 
-    # =========================================================
-    # 4. VALIDACIÓN FINAL DEL FORMATO
-    # =========================================================
+    # 4) Validación
 
     valido = validar_matricula(plate)
 
