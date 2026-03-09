@@ -6,7 +6,6 @@ ENV PYTHONPATH=/app
 
 WORKDIR /app
 
-# Dependencias del sistema para OpenCV (libxcb, etc.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     libsm6 \
@@ -18,9 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY src/server.py .
 COPY src/ src/
 COPY models/ models/
 COPY data/ data/
 COPY tests/ tests/
 
-CMD ["python", "-m", "src.lector_matriculas"]
+EXPOSE 8080
+
+CMD ["python", "server.py"]

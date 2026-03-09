@@ -1,37 +1,55 @@
-# classifier.py
-import joblib
+# src/classifier.py
+
 import os
 import numpy as np
+import tensorflow as tf
 
-# __file__ : ruta del archivo actual
+# Ruta base del proyecto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODEL_PATH = os.path.join(BASE_DIR, "models", "digit_model.pkl")
+# Ruta del modelo entrenado
+MODEL_PATH = os.path.join(BASE_DIR, "models", "models", "digit_cnn_invalid.keras")
 
-# CARGA DEL MODELO ENTRENADO
-# Así se evita tener que entrenarlo cada vez que se ejecuta el sistema
-model = joblib.load(MODEL_PATH)
+# Clase especial para inválido
+INVALID_CLASS = 10
 
-# FUNCIÓN PARA PREDECIR UN DÍGITO
+# Cargar el modelo una sola vez
+model = tf.keras.models.load_model(MODEL_PATH)
+
+
+def predictive_entropy(probs, eps=1e-12):
+    """
+    Calcula la entropía de la distribución de probabilidades.
+    Cuanto mayor es, más incertidumbre tiene el modelo.
+    """
+    probs = np.clip(probs, eps, 1.0)
+    return float(-np.sum(probs * np.log(probs)))
+
+
 def predict_digit(digit):
+    """
+    Recibe una imagen 28x28 ya normalizada y devuelve:
+    - predicción
+    - confianza
+    - entropía
+    - si es inválido
+    """
+    # Asegurar formato correcto para la CNN
+    digit = np.array(digit, dtype=np.float32).reshape(1, 28, 28, 1)
 
-    # Convertir el dígito a un array de numpy
-    # y asegurar que tenga forma (1, 784)
-    # ya que el modelo espera una matriz de muestras
-    digit = np.array(digit).reshape(1, -1)
+    # Predicción del modelo
+    probs = model.predict(digit, verbose=0)[0]
 
-    # Obtener las probabilidades de pertenecer a cada clase (0-9)
-    probs = model.predict_proba(digit)[0]
+    # Clase predicha
+    pred = int(np.argmax(probs))
 
-    # Obtener la confianza de la predicción
-    # es decir, la probabilidad más alta
-    confidence = max(probs)
+    # Confianza = probabilidad máxima
+    confidence = float(np.max(probs))
 
-    # Obtener el dígito predicho
-    # se selecciona la clase con mayor probabilidad
-    pred = model.classes_[np.argmax(probs)]
+    # Incertidumbre
+    entropy = predictive_entropy(probs)
 
-    # Devolver:
-    # -el dígito predicho
-    # -la confianza del modelo
-    return pred, confidence
+    # ¿El modelo lo considera inválido?
+    is_invalid = (pred == INVALID_CLASS)
+
+    return pred, confidence, entropy, is_invalid
